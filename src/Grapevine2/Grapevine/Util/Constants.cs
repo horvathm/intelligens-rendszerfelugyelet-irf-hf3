@@ -1,0 +1,83 @@
+﻿using Grapevine.Client;
+using System;
+using System.Text;
+
+namespace Grapevine
+{
+    /// <summary>
+    /// Contains parameters for the counters
+    /// </summary>
+    public struct Counters
+    {
+        public const string CategoryName = "IRF_Rest";
+    }
+
+    /// <summary>
+    /// Contains sample reply to the common events
+    /// </summary>
+    public struct Resources
+    {
+        public const string PerformanceCountersNotExistUIMessage = "PerformanceCounter category don't exists";
+
+    }
+
+    public enum ProbeType
+    {
+        INCRSTEP, CONST
+    }
+    
+    public class Requests
+    {
+        public RESTRequest[] reqArray;
+        Random r = new Random(DateTime.Now.Millisecond);
+
+        public Requests(int items, ProbeType pt)
+        {
+            reqArray = new RESTRequest[items];
+
+            switch(pt)
+            {
+                case ProbeType.INCRSTEP:
+                    uploadWithRaisingLength();
+                    break;
+                case ProbeType.CONST:
+                    uploadWithConstLength();
+                    break;
+            }
+
+        }
+
+        private void uploadWithConstLength()
+        {
+            for (int i = 0; i < reqArray.Length; i++)
+            {
+                RESTRequest temp = new RESTRequest();
+                temp.Resource = "resoruce/a/"+r.Next(100,999);
+                temp.Method = HttpMethod.POST;
+                temp.ContentType = ContentType.TXT;
+                temp.Payload = r.Next(1000,9999).ToString();
+                reqArray[i] = temp;
+            }
+        }
+
+        private void uploadWithRaisingLength()
+        {
+            for (int i = 0; i < reqArray.Length; i++)
+            {
+                RESTRequest temp = new RESTRequest();
+                temp.Resource = "resoruce/a/" + r.Next(100, 999);
+                temp.Method = HttpMethod.POST;
+                temp.ContentType = ContentType.TXT;
+
+                StringBuilder sb = new StringBuilder();
+                for (int j = -1; j < i; j++)
+                {
+                    sb.Append(r.Next(10000, 99999));
+                }
+                temp.Payload = sb.ToString();
+                reqArray[i] = temp;
+            }
+    }
+
+    }
+}
